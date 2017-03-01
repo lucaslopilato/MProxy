@@ -7,7 +7,22 @@ import sys
 
 # Print Help Message
 def help():
-    print("Help Message")
+    print("Usage: python mproxy.py [options] [port]")
+    print()
+    print("Timeout option assumes seconds.")
+    print(" -h, --help                        Prints this message.")
+    print(" -v, --version                     Prints version information.")
+    print(" -p, --port port                   Specify port to listen on.")
+    print("                                     If specified port is")
+    print("                                     occupied, will try another port.")
+    print(" -n, --numworker num_of_worker     Number of workers in thread")
+    print("                                     pool handling concurrent")
+    print("                                     requests. Defaults to 10.")
+    print(" -t, --timeout <time>              Time(sec) to wait before giving")
+    print("                                     up waiting for server")
+    print("                                     response. Defaults to infinity.")
+    print(" -l, --log directory               Log HTTP requests and responses")
+    print("                                     under specified directory.")
     exit(0)
 
 
@@ -16,6 +31,7 @@ def version():
     exit(0)
 
 
+# TODO figure out desired behavior for both short and long provided
 def main(argv):
     try:
         # Scan for Help Version Port Workers Time and Log
@@ -24,9 +40,8 @@ def main(argv):
                             ["help", "version",
                              "port=", "numworker",
                              "timeout", "log="])
-    except GetoptError as e:
-        print(e)
-        exit(2)
+    except:
+        help()
 
     # Initialize Options
     options = {
