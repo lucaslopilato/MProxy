@@ -1,14 +1,18 @@
 # Lucas Lopilato 2/28/2017
 # Man in the middle Proxy Server
 # CS176B HW3
-from getopt import getopt, GetoptError
+from getopt import getopt
 import sys
+import logging
+
+# Non standard classes
+from HttpProxy import *
 
 
 # Print Help Message
 def help():
-    print("Usage: python mproxy.py [options] [port]")
-    print()
+    print("Usage: python mproxy.py [options] -p port")
+    print
     print("Timeout option assumes seconds.")
     print(" -h, --help                        Prints this message.")
     print(" -v, --version                     Prints version information.")
@@ -18,7 +22,7 @@ def help():
     print(" -n, --numworker num_of_worker     Number of workers in thread")
     print("                                     pool handling concurrent")
     print("                                     requests. Defaults to 10.")
-    print(" -t, --timeout <time>              Time(sec) to wait before giving")
+    print(" -t, --timeout time                Time(sec) to wait before giving")
     print("                                     up waiting for server")
     print("                                     response. Defaults to infinity.")
     print(" -l, --log directory               Log HTTP requests and responses")
@@ -36,7 +40,7 @@ def main(argv):
     try:
         # Scan for Help Version Port Workers Time and Log
         opt, after = getopt(argv,
-                            "hvp:ntl:",
+                            "hvp:ntl:d",
                             ["help", "version",
                              "port=", "numworker",
                              "timeout", "log="])
@@ -45,8 +49,10 @@ def main(argv):
 
     # Initialize Options
     options = {
+        "bufferSize": 2048,
         "numworker": 10,
-        "timeout": -1,
+        "timeout": 0,
+        "logger": logging.WARNING  # TODO change
     }
     try:
         # Parse Each Argument
@@ -62,15 +68,20 @@ def main(argv):
             elif o in ("-t", "--timeout"):
                 options["timeout"] = int(a)
             elif o in ("-l", "--log"):
-                options["log"] = a  # TODO Check for validity
+                options["log"] = a  # TODO0 Check for validity
+            elif o in ("-d"):
+                options["logger"] = logging.INFO
             else:
                 help()
     except:
         help()
 
     # Assert Port Number Supplied
-    if "port" not in options:
+    if 'port' not in options:
         help()
+
+    # Start the server
+    server = HttpProxy(options)
 
 
 if __name__ == '__main__':
